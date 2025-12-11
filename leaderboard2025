@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulation Leaderboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --accent: #d10000;
+      --border: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+    }
+
+    .app {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sidebar {
+      width: 260px;
+      border-right: 2px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: #f7f7f7;
+    }
+
+    .sidebar-section h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background 0.15s ease, color 0.15s ease,
+        transform 0.05s ease;
+    }
+
+    .toggle-btn.active-sim {
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .toggle-btn.active-level {
+      background: var(--text);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .main {
+      flex: 1;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .header {
+      margin-bottom: 24px;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #444444;
+      margin: 0;
+    }
+
+    .leaderboard-wrapper {
+      flex: 1;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #f0f0f0;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .rank-cell {
+      font-weight: 700;
+      color: var(--accent);
+      width: 70px;
+    }
+
+    .footer-note {
+      padding: 10px 12px;
+      font-size: 12px;
+      border-top: 2px solid var(--border);
+      background: #f7f7f7;
+    }
+
+    /* Responsive */
+    @media (max-width: 800px) {
+      body {
+        flex-direction: column;
+      }
+
+      .app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        border-right: none;
+        border-bottom: 2px solid var(--border);
+      }
+
+      .sidebar-section {
+        flex: 1 1 160px;
+      }
+
+      .main {
+        padding: 20px;
+      }
+
+      .title {
+        font-size: 22px;
+      }
+
+      th, td {
+        padding: 8px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h2>Simulation type</h2>
+        <div class="button-list" id="simButtons">
+          <button class="toggle-btn" data-sim="Markets">Markets</button>
+          <button class="toggle-btn" data-sim="Banking">Banking</button>
+          <button class="toggle-btn" data-sim="Quant">Quant</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h2>Level</h2>
+        <div class="button-list" id="levelButtons">
+          <button class="toggle-btn" data-level="1">Level 1</button>
+          <button class="toggle-btn" data-level="2">Level 2</button>
+          <button class="toggle-btn" data-level="3">Level 3</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1 class="title" id="leaderboardTitle">
+          Markets leaderboard  Level 1
+        </h1>
+        <p class="subtitle">
+          Top 10 performers ranked from 1 to 10. Name, university and nationality
+          in black, white and red.
+        </p>
+      </header>
+
+      <section class="leaderboard-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>University</th>
+              <th>Nationality</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Rows injected by JavaScript -->
+          </tbody>
+        </table>
+        <div class="footer-note" id="footerNote">
+          Showing simulated data for Markets Level 1. Replace with live data
+          when ready.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Dummy leaderboard data  replace with real data from your backend if needed
+    const leaderboardData = {
+      Markets: {
+        1: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Markets L1 Student ${i + 1}`,
+          uni: "City University of Hong Kong",
+          nationality: "Hong Kong",
+        })),
+        2: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Markets L2 Student ${i + 1}`,
+          uni: "UCL",
+          nationality: "United Kingdom",
+        })),
+        3: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Markets L3 Student ${i + 1}`,
+          uni: "National University of Singapore",
+          nationality: "Singapore",
+        })),
+      },
+      Banking: {
+        1: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Banking L1 Student ${i + 1}`,
+          uni: "Imperial College London",
+          nationality: "United Kingdom",
+        })),
+        2: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Banking L2 Student ${i + 1}`,
+          uni: "HKUST",
+          nationality: "Hong Kong",
+        })),
+        3: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Banking L3 Student ${i + 1}`,
+          uni: "University of Oxford",
+          nationality: "Ireland",
+        })),
+      },
+      Quant: {
+        1: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Quant L1 Student ${i + 1}`,
+          uni: "MIT",
+          nationality: "United States",
+        })),
+        2: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Quant L2 Student ${i + 1}`,
+          uni: "ETH Zurich",
+          nationality: "Switzerland",
+        })),
+        3: Array.from({ length: 10 }, (_, i) => ({
+          rank: i + 1,
+          name: `Quant L3 Student ${i + 1}`,
+          uni: "University of Cambridge",
+          nationality: "United Kingdom",
+        })),
+      },
+    };
+
+    let currentSim = "Markets";
+    let currentLevel = 1;
+
+    const simButtons = document.querySelectorAll("#simButtons .toggle-btn");
+    const levelButtons = document.querySelectorAll("#levelButtons .toggle-btn");
+    const titleEl = document.getElementById("leaderboardTitle");
+    const bodyEl = document.getElementById("leaderboardBody");
+    const footerEl = document.getElementById("footerNote");
+
+    function renderLeaderboard() {
+      const entries = leaderboardData[currentSim][currentLevel];
+
+      // Update title
+      titleEl.textContent = `${currentSim} leaderboard  Level ${currentLevel}`;
+
+      // Update table body
+      bodyEl.innerHTML = "";
+      entries.forEach((entry) => {
+        const tr = document.createElement("tr");
+
+        const rankTd = document.createElement("td");
+        rankTd.textContent = entry.rank;
+        rankTd.className = "rank-cell";
+
+        const nameTd = document.createElement("td");
+        nameTd.textContent = entry.name;
+
+        const uniTd = document.createElement("td");
+        uniTd.textContent = entry.uni;
+
+        const natTd = document.createElement("td");
+        natTd.textContent = entry.nationality;
+
+        tr.appendChild(rankTd);
+        tr.appendChild(nameTd);
+        tr.appendChild(uniTd);
+        tr.appendChild(natTd);
+
+        bodyEl.appendChild(tr);
+      });
+
+      // Update footer note
+      footerEl.textContent =
+        "Showing simulated data for " +
+        currentSim +
+        " Level " +
+        currentLevel +
+        ". Replace with live data when ready.";
+
+      // Update active button states
+      simButtons.forEach((btn) => {
+        btn.classList.toggle(
+          "active-sim",
+          btn.getAttribute("data-sim") === currentSim
+        );
+      });
+
+      levelButtons.forEach((btn) => {
+        btn.classList.toggle(
+          "active-level",
+          Number(btn.getAttribute("data-level")) === currentLevel
+        );
+      });
+    }
+
+    // Add event listeners
+    simButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentSim = btn.getAttribute("data-sim");
+        renderLeaderboard();
+      });
+    });
+
+    levelButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentLevel = Number(btn.getAttribute("data-level"));
+        renderLeaderboard();
+      });
+    });
+
+    // Initial render
+    renderLeaderboard();
+  </script>
+</body>
+</html>
